@@ -37,7 +37,7 @@ def list_communities(event, context):
             batch_size=PAGE_SIZE + 1,
             sort=[("_-id", pymongo.ASCENDING)],
             skip=(page-1) * PAGE_SIZE):
-        community_list.append(bson.dumps(community_bson))
+        community_list.append(json.loads(bson.dumps(community_bson)))
 
     return {
         "isBase64Encoded": True,
