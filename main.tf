@@ -18,37 +18,9 @@ data "tfe_outputs" "api_gateway" {
   workspace = "api-gateway"
 }
 
-resource "aws_ecr_repository" "main" {
-  name                 = var.service_name
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = false
-  }
-}
-
-resource "aws_ecr_lifecycle_policy" "main" {
-  repository = aws_ecr_repository.main.name
-
-  policy = <<EOF
-{
-    "rules": [
-        {
-            "rulePriority": 1,
-            "description": "Keep last 5 images",
-            "selection": {
-                "tagStatus": "tagged",
-                "tagPrefixList": ["v"],
-                "countType": "imageCountMoreThan",
-                "countNumber": 5
-            },
-            "action": {
-                "type": "expire"
-            }
-        }
-    ]
-}
-EOF
+data "tfe_outputs" "ecr_repositories" {
+  organization = "everyones-a-critic"
+  workspace = "ecr-repositories"
 }
 
 resource "mongodbatlas_project" "main" {
@@ -139,7 +111,7 @@ resource "mongodbatlas_cloud_provider_access_authorization" "auth_role" {
 }
 
 resource "aws_lambda_function" "main" {
-  image_uri     = "${aws_ecr_repository.main.repository_url}:latest"
+  image_uri     = "${data.tfe_outputs.ecr_repositories.values.communities_service_repository_url}:latest"
   package_type  = "Image"
   function_name = var.service_name
   role          = aws_iam_role.mongo-atlas-access.arn
