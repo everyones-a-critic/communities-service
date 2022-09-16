@@ -49,7 +49,6 @@ resource "mongodbatlas_advanced_cluster" "main" {
       provider_name               = "TENANT"
       backing_provider_name       = "AWS"
       region_name        = var.mongo_region
-      priority = 1
     }
   }
 }
