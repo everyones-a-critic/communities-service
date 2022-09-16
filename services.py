@@ -40,11 +40,15 @@ def list_communities(event, context):
         community_list.append(bson.dumps(community_bson))
 
     return {
+        "isBase64Encoded": True,
         'statusCode': 200,
-        'body': {
+        'headers': None,
+        'multiValueHeaders': None,
+        'body': json.dumps({
             'next': f'{host}{path}?page={page + 1}' if len(community_list) > PAGE_SIZE else None,
             'previous': f'{host}{path}?page={page - 1}' if page > 1 else None,
-            'results': json.dumps(community_list[:PAGE_SIZE])
-        }
+            'results': community_list[:PAGE_SIZE]
+        })
     }
+
 
