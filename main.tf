@@ -5,6 +5,13 @@ terraform {
       version = "1.4.5"
     }
   }
+
+  cloud {
+    organization = "everyones-a-critic"
+    workspaces {
+      name = "communities-service"
+    }
+  }
 }
 
 provider "mongodbatlas" {}
