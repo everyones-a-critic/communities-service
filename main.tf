@@ -22,12 +22,12 @@ provider "aws" {
 
 data "tfe_outputs" "api_gateway" {
   organization = "everyones-a-critic"
-  workspace = "api-gateway"
+  workspace    = "api-gateway"
 }
 
 data "tfe_outputs" "ecr_repositories" {
   organization = "everyones-a-critic"
-  workspace = "ecr-repositories"
+  workspace    = "ecr-repositories"
 }
 
 resource "mongodbatlas_project" "main" {
@@ -36,8 +36,8 @@ resource "mongodbatlas_project" "main" {
 }
 
 resource "mongodbatlas_advanced_cluster" "main" {
-  project_id = mongodbatlas_project.main.id
-  name       = "eac-ratings-dev"
+  project_id   = mongodbatlas_project.main.id
+  name         = "eac-ratings-dev"
   cluster_type = "REPLICASET"
 
   replication_specs {
@@ -46,9 +46,10 @@ resource "mongodbatlas_advanced_cluster" "main" {
         instance_size = "M0"
       }
 
-      provider_name               = "TENANT"
-      backing_provider_name       = "AWS"
-      region_name        = var.mongo_region
+      provider_name         = "TENANT"
+      backing_provider_name = "AWS"
+      region_name           = var.mongo_region
+      priority              = 7
     }
   }
 }
@@ -70,7 +71,7 @@ resource "mongodbatlas_database_user" "admin" {
   }
 
   scopes {
-    name   = mongodbatlas_advanced_cluster.main.name
+    name = mongodbatlas_advanced_cluster.main.name
     type = "CLUSTER"
   }
 }
@@ -177,7 +178,7 @@ resource "aws_api_gateway_resource" "communities" {
 }
 
 resource "aws_api_gateway_method" "method" {
-  rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
+  rest_api_id   = data.tfe_outputs.api_gateway.values.gateway_id
   resource_id   = aws_api_gateway_resource.communities.id
   http_method   = "GET"
   authorization = "COGNITO_USER_POOLS"
@@ -185,8 +186,8 @@ resource "aws_api_gateway_method" "method" {
 }
 
 resource "aws_api_gateway_integration" "integration" {
-  rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
-  resource_id   = aws_api_gateway_resource.communities.id
+  rest_api_id             = data.tfe_outputs.api_gateway.values.gateway_id
+  resource_id             = aws_api_gateway_resource.communities.id
   http_method             = aws_api_gateway_method.method.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
