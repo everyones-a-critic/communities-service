@@ -11,13 +11,13 @@ def load_data():
     )
 
     communities_to_insert = [
-        {"name": "Coffee", "plural_name": "Coffees"},
-        {"name": "Whiskey", "plural_name": "Whiskeys"},
-        {"name": "Restaurant", "plural_name": "Restaurants"},
-        {"name": "Tequila", "plural_name": "Tequilas"},
-        {"name": "Coffee Shop", "plural_name": "Coffee Shops"},
-        {"name": "Movie", "plural_name": "Movies"},
-        {"name": "Beer", "plural_name": "Beers"},
+        {"display_name": "Coffee", "name": "Coffee", "plural_name": "Coffees", "icon": "coffee", "primary_color": "413121",  "secondary_color": "FFFFFF"},
+        {"display_name": "Whiskey", "name": "Whiskey", "plural_name": "Whiskeys", "background_color": "413121", "icon": "whiskey-glass", "primary_color": "121B26",  "secondary_color": "BEA480"},
+        {"display_name": "Restaurants", "name": "Restaurant", "plural_name": "Restaurants", "icon": "utensils", "primary_color": "BF0704",  "secondary_color": "FFFFFF"},
+        {"display_name": "Coffee Shops", "name": "Coffee Shop", "plural_name": "Coffee Shops", "icon": "coffee", "primary_color": "FFFAE7",  "secondary_color": "604A3F"},
+        {"display_name": "Golf Courses", "name": "Golf Course", "plural_name": "Golf Courses", "icon": "golf-ball", "primary_color": "004D43",  "secondary_color": "FFFCDF"},
+        {"display_name": "Movies", "name": "Movie", "plural_name": "Movies", "icon": "clapperboard", "primary_color": "4808B0", "secondary_color": "FFFFFF"},
+        {"display_name": "Beer", "name": "Beer", "plural_name": "Beers", "icon": "wheat-alt", "primary_color": "20353C", "secondary_color": "BDA571"},
     ]
 
     db = client['eac-ratings-dev']
