@@ -25,7 +25,7 @@ client = pymongo.MongoClient(
 
 
 def list_communities(event, context):
-    page = event.get('page', 1)
+    page = event.get('queryStringParameters', {}).get('page', 1)
     host = event.get('host')
     path = event.get('path')
 
