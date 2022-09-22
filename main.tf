@@ -32,6 +32,7 @@ resource "aws_api_gateway_resource" "communities" {
 }
 
 module "api_gateway_lambda_service" {
+  source = "./modules/api_gateway_lambda_service"
   service_name     = "get-communities"
   command          = "services.list_communities"
   gateway_resource = aws_api_gateway_resource.communities
