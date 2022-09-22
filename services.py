@@ -25,7 +25,6 @@ client = pymongo.MongoClient(
 
 
 def list_communities(event, context):
-    print(event)
     query_params = event.get('queryStringParameters')
     if query_params is None:
         page = 1
