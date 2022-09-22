@@ -12,7 +12,7 @@ resource "aws_lambda_function" "main" {
   image_uri     = "${data.tfe_outputs.ecr_repositories.values.communities_service_repository_url}:latest"
   package_type  = "Image"
   function_name = var.service_name
-  role          = lambda_role
+  role          = var.lambda_role
 
   image_config {
     # use this to point to different handlers within
@@ -23,7 +23,7 @@ resource "aws_lambda_function" "main" {
 
   environment {
     variables = {
-      MONGO_URI = mongo_cluster.connection_strings.0.standard_srv
+      MONGO_URI = var.mongo_cluster.connection_strings.0.standard_srv
     }
   }
 }
