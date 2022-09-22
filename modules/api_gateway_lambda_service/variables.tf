@@ -16,5 +16,5 @@ variable "command" {
 }
 
 variable "gateway_resource" {
-    "API Gateway resource id housing the endpoint through which the lambda function will be exposed"
+    description = "API Gateway resource id housing the endpoint through which the lambda function will be exposed"
 }
