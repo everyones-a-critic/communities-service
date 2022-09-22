@@ -36,6 +36,8 @@ module "api_gateway_lambda_service" {
   service_name     = "get-communities"
   command          = "services.list_communities"
   gateway_resource = aws_api_gateway_resource.communities
+  lambda_role = aws_iam_role.mongo-atlas-access.arn
+  mongo_cluster = mongodbatlas_advanced_cluster.main
 }
 
 resource "mongodbatlas_project" "main" {

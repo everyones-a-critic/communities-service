@@ -18,3 +18,11 @@ variable "command" {
 variable "gateway_resource" {
     description = "API Gateway resource id housing the endpoint through which the lambda function will be exposed"
 }
+
+variable "mongo_cluster" {
+    description = "Terraform resource representing the mongo cluster which will be used by the lambda"
+}
+
+variable "lambda_role" {
+    description = "ARN of the IAM role used when executing the lambda. Should have access to the MongoDB account."
+}
