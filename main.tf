@@ -31,7 +31,7 @@ resource "aws_api_gateway_resource" "communities" {
   rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
 }
 
-module "api_gateway_lambda_service" {
+module "get_communities_service" {
   source = "./modules/api_gateway_lambda_service"
   service_name     = "get-communities"
   command          = "services.list_communities"
