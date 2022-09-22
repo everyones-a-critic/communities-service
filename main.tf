@@ -58,7 +58,7 @@ module "post_community_join" {
   service_name     = "join-community"
   command          = "services.join_community"
   http_method = "POST"
-  gateway_resource = aws_api_gateway_resource.join_community
+  gateway_resource = aws_api_gateway_resource.enrollment
   lambda_role = aws_iam_role.mongo-atlas-access.arn
   mongo_cluster = mongodbatlas_advanced_cluster.main
 }
