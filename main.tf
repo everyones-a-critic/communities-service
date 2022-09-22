@@ -47,8 +47,8 @@ resource "aws_api_gateway_resource" "community_id" {
   rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
 }
 
-resource "aws_api_gateway_resource" "join_community" {
-  path_part   = "join"
+resource "aws_api_gateway_resource" "enrollment" {
+  path_part   = "enrollment"
   parent_id   = aws_api_gateway_resource.community_id.id
   rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
 }
