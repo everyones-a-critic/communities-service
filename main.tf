@@ -35,6 +35,7 @@ module "get_communities_service" {
   source = "./modules/api_gateway_lambda_service"
   service_name     = "get-communities"
   command          = "services.list_communities"
+  http_method = "GET"
   gateway_resource = aws_api_gateway_resource.communities
   lambda_role = aws_iam_role.mongo-atlas-access.arn
   mongo_cluster = mongodbatlas_advanced_cluster.main
@@ -48,7 +49,7 @@ resource "aws_api_gateway_resource" "community_id" {
 
 resource "aws_api_gateway_resource" "join_community" {
   path_part   = "join"
-  parent_id   = aws_api_gateway_resource.community.id
+  parent_id   = aws_api_gateway_resource.community_id.id
   rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
 }
 
@@ -56,6 +57,7 @@ module "post_community_join" {
   source = "./modules/api_gateway_lambda_service"
   service_name     = "join-community"
   command          = "services.join_community"
+  http_method = "POST"
   gateway_resource = aws_api_gateway_resource.join_community
   lambda_role = aws_iam_role.mongo-atlas-access.arn
   mongo_cluster = mongodbatlas_advanced_cluster.main

@@ -36,7 +36,7 @@ resource "aws_cloudwatch_log_group" "example" {
 resource "aws_api_gateway_method" "method" {
   rest_api_id   = data.tfe_outputs.api_gateway.values.gateway_id
   resource_id   = var.gateway_resource.id
-  http_method   = "GET"
+  http_method   = var.http_method
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = data.tfe_outputs.api_gateway.values.authorizer_id
 }

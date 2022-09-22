@@ -26,3 +26,7 @@ variable "mongo_cluster" {
 variable "lambda_role" {
     description = "ARN of the IAM role used when executing the lambda. Should have access to the MongoDB account."
 }
+
+variable "http_method" {
+    description = "What type of http method should be used to execute the lambda"
+}
