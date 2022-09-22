@@ -25,12 +25,13 @@ client = pymongo.MongoClient(
 
 
 def list_communities(event, context):
-    query_params = event.get('queryStringParameters', {})
-    page = int(query_params.get('page'))
-    if not page:
+    print(event)
+    query_params = event.get('queryStringParameters')
+    if query_params is None:
         page = 1
+    else:
+        page = int(query_params.get('page', '1'))
 
-    host = event.get('host')
     path = event.get('path')
 
     # log.info("this is running")
@@ -49,8 +50,8 @@ def list_communities(event, context):
         'headers': None,
         'multiValueHeaders': None,
         'body': json.dumps({
-            'next': f'{host}{path}?page={page + 1}' if len(community_list) > PAGE_SIZE else None,
-            'previous': f'{host}{path}?page={page - 1}' if page > 1 else None,
+            'next': f'{path}?page={page + 1}' if len(community_list) > PAGE_SIZE else None,
+            'previous': f'{path}?page={page - 1}' if page > 1 else None,
             'results': community_list[:PAGE_SIZE]
         })
     }
