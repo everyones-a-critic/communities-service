@@ -40,6 +40,27 @@ module "get_communities_service" {
   mongo_cluster = mongodbatlas_advanced_cluster.main
 }
 
+resource "aws_api_gateway_resource" "community_id" {
+  path_part   = "{community_id}"
+  parent_id   = aws_api_gateway_resource.communities.id
+  rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
+}
+
+resource "aws_api_gateway_resource" "join_community" {
+  path_part   = "join"
+  parent_id   = aws_api_gateway_resource.community.id
+  rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
+}
+
+module "post_community_join" {
+  source = "./modules/api_gateway_lambda_service"
+  service_name     = "join-community"
+  command          = "services.join_community"
+  gateway_resource = aws_api_gateway_resource.join_community
+  lambda_role = aws_iam_role.mongo-atlas-access.arn
+  mongo_cluster = mongodbatlas_advanced_cluster.main
+}
+
 resource "mongodbatlas_project" "main" {
   name   = "eac-ratings"
   org_id = var.mongo_org_id

@@ -56,3 +56,14 @@ def list_communities(event, context):
     }
 
 
+def join_community(event, context):
+    print(event)
+
+    return {
+        "isBase64Encoded": True,
+        'statusCode': 200,
+        'headers': None,
+        'multiValueHeaders': None,
+        'body': None
+    }
+
