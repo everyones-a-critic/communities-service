@@ -121,7 +121,7 @@ resource "mongodbatlas_database_user" "admin" {
 }
 
 resource "mongodbatlas_search_index" "community_name" {
-  name   = "project-name"
+  name   = "default"
   project_id = mongodbatlas_project.main.id
   cluster_name = mongodbatlas_advanced_cluster.main.name
 
