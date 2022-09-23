@@ -20,7 +20,7 @@ def load_data():
         {"display_name": "Beer", "name": "Beer", "plural_name": "Beers", "icon": "wheat-alt", "primary_color": "20353C", "secondary_color": "BDA571"},
     ]
 
-    db = client['eac-ratings-dev']
+    db = client['prod']
     community_coll = db.community
     community_coll.create_index("name")
     community_coll.drop()
