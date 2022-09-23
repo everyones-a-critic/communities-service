@@ -201,4 +201,6 @@ resource "mongodbatlas_cloud_provider_access_authorization" "auth_role" {
   aws {
     iam_assumed_role_arn = aws_iam_role.mongo-atlas-access.arn
   }
+
+  depends_on = [aws_iam_role.mongo-atlas-access.arn]
 }
