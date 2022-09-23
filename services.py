@@ -70,7 +70,7 @@ def join_community(event, context):
     try:
         community_member.insert_one({
             "community_id": community_id,
-            user_id: "user_id",
+            "user_id": user_id,
             "created_date": datetime.datetime.utcnow()
         })
     except pymongo.errors.DuplicateKeyError:
@@ -79,7 +79,7 @@ def join_community(event, context):
             'statusCode': 409,
             'headers': None,
             'multiValueHeaders': None,
-            'body': {}
+            'body': json.dumps({"message": "You are already a member of that community"})
         }
     else:
         return {
@@ -87,7 +87,7 @@ def join_community(event, context):
             'statusCode': 201,
             'headers': None,
             'multiValueHeaders': None,
-            'body': {}
+            'body': json.dumps({})
         }
 
 
@@ -113,87 +113,3 @@ def leave_community(event, context):
         'body': {}
     }
 
-# {
-# 	'resource': '/communities/{community_id}/enrollment',
-# 	'path': '/communities/632ccc0a4a531cf8d1db6cdd/enrollment',
-# 	'httpMethod': 'POST',
-# 	'headers': {
-# 		'Accept': '*/*',
-# 		'Accept-Encoding': 'gzip, deflate, br',
-# 		'Authorization': 'eyJraWQiOiJYYVduT0g2Y0RQbkVTZktpRUdMU29wK3E5V0d3UCs5R3kwTXZMK2owdFwvQT0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJiZGJlZjY0ZS05MGRhLTRjOWYtYjQ5Ny0zYTI2ZThjZTEwNzMiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLnVzLXdlc3QtMS5hbWF6b25hd3MuY29tXC91cy13ZXN0LTFfUjZGSlRRdTFLIiwiY29nbml0bzp1c2VybmFtZSI6ImJkYmVmNjRlLTkwZGEtNGM5Zi1iNDk3LTNhMjZlOGNlMTA3MyIsIm9yaWdpbl9qdGkiOiIxYjg3YWI5ZC04NzUwLTQxNjgtOTBhYS04NDQ0ZDY2NTU0ZjIiLCJhdWQiOiIycGVwNDdyM3FxdmwwNXViODNqdGszcXVrcCIsImV2ZW50X2lkIjoiNGMxYzRkZGEtYTUzYy00ZWI2LTkxODgtMWRlMzIxYTM4NzhmIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2NjM3MDE5NzYsImV4cCI6MTY2Mzg4NjgwNiwiaWF0IjoxNjYzODgzMjA3LCJqdGkiOiJhYjJiOWJlMi1mYjdiLTQyZjctODI1OS1lOWVlODAyMWYwZmIiLCJlbWFpbCI6IjI0LmRhbmllbC5sb25nQGdtYWlsLmNvbSJ9.T09kKwCDXfFP67OIqTU8mqNxA0kNB4ZrIbIWrcmGPaztPMAjx8rUf8DLkX5_0QMsUrpKXmt-FVc_UnmiiXgF25pimk3i6ClDfUn2TDoXoZA3FVk_ylccMIS4QGKpsxWrsDiEx2xznyAizvtjbHwRxqJlRjRk0c0zHCB0gpgy1OhnbsyffLVKbG8WS_0PdK2xF80NRK49k-9VegVZg3hAuACrIg2Tl4bNm4CwDgL1O826CHzd92HreOr8BRgp0WOTTAotyZ9T5NKa74QuQc7Fjg1wPAyO-qUNR7Smpyf5gWT0D_fii6iE1AkpYJ0zJXRSboRW7e3N3j9oSwaxI8F04g',
-# 		'Cache-Control': 'no-cache',
-# 		'Host': 'api.everyonesacriticapp.com',
-# 		'Postman-Token': '1b340c20-3af3-4308-b1fc-5513dc1459e2',
-# 		'User-Agent': 'PostmanRuntime/7.29.2',
-# 		'X-Amzn-Trace-Id': 'Root=1-632cddf3-7777baac7019d6430303d158',
-# 		'X-Forwarded-For': '65.205.72.122',
-# 		'X-Forwarded-Port': '443',
-# 		'X-Forwarded-Proto': 'https'
-# 	},
-# 	'multiValueHeaders': {
-# 		'Accept': ['*/*'],
-# 		'Accept-Encoding': ['gzip, deflate, br'],
-# 		'Authorization': ['eyJraWQiOiJYYVduT0g2Y0RQbkVTZktpRUdMU29wK3E5V0d3UCs5R3kwTXZMK2owdFwvQT0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJiZGJlZjY0ZS05MGRhLTRjOWYtYjQ5Ny0zYTI2ZThjZTEwNzMiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLnVzLXdlc3QtMS5hbWF6b25hd3MuY29tXC91cy13ZXN0LTFfUjZGSlRRdTFLIiwiY29nbml0bzp1c2VybmFtZSI6ImJkYmVmNjRlLTkwZGEtNGM5Zi1iNDk3LTNhMjZlOGNlMTA3MyIsIm9yaWdpbl9qdGkiOiIxYjg3YWI5ZC04NzUwLTQxNjgtOTBhYS04NDQ0ZDY2NTU0ZjIiLCJhdWQiOiIycGVwNDdyM3FxdmwwNXViODNqdGszcXVrcCIsImV2ZW50X2lkIjoiNGMxYzRkZGEtYTUzYy00ZWI2LTkxODgtMWRlMzIxYTM4NzhmIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2NjM3MDE5NzYsImV4cCI6MTY2Mzg4NjgwNiwiaWF0IjoxNjYzODgzMjA3LCJqdGkiOiJhYjJiOWJlMi1mYjdiLTQyZjctODI1OS1lOWVlODAyMWYwZmIiLCJlbWFpbCI6IjI0LmRhbmllbC5sb25nQGdtYWlsLmNvbSJ9.T09kKwCDXfFP67OIqTU8mqNxA0kNB4ZrIbIWrcmGPaztPMAjx8rUf8DLkX5_0QMsUrpKXmt-FVc_UnmiiXgF25pimk3i6ClDfUn2TDoXoZA3FVk_ylccMIS4QGKpsxWrsDiEx2xznyAizvtjbHwRxqJlRjRk0c0zHCB0gpgy1OhnbsyffLVKbG8WS_0PdK2xF80NRK49k-9VegVZg3hAuACrIg2Tl4bNm4CwDgL1O826CHzd92HreOr8BRgp0WOTTAotyZ9T5NKa74QuQc7Fjg1wPAyO-qUNR7Smpyf5gWT0D_fii6iE1AkpYJ0zJXRSboRW7e3N3j9oSwaxI8F04g'],
-# 		'Cache-Control': ['no-cache'],
-# 		'Host': ['api.everyonesacriticapp.com'],
-# 		'Postman-Token': ['1b340c20-3af3-4308-b1fc-5513dc1459e2'],
-# 		'User-Agent': ['PostmanRuntime/7.29.2'],
-# 		'X-Amzn-Trace-Id': ['Root=1-632cddf3-7777baac7019d6430303d158'],
-# 		'X-Forwarded-For': ['65.205.72.122'],
-# 		'X-Forwarded-Port': ['443'],
-# 		'X-Forwarded-Proto': ['https']
-# 	},
-# 	'queryStringParameters': None,
-# 	'multiValueQueryStringParameters': None,
-# 	'pathParameters': {
-# 		'community_id': '632ccc0a4a531cf8d1db6cdd'
-# 	},
-# 	'stageVariables': None,
-# 	'requestContext': {
-# 		'resourceId': '8bpwk8',
-# 		'authorizer': {
-# 			'claims': {
-# 				'sub': 'bdbef64e-90da-4c9f-b497-3a26e8ce1073',
-# 				'email_verified': 'true',
-# 				'iss': 'https://cognito-idp.us-west-1.amazonaws.com/us-west-1_R6FJTQu1K',
-# 				'cognito:username': 'bdbef64e-90da-4c9f-b497-3a26e8ce1073',
-# 				'origin_jti': '1b87ab9d-8750-4168-90aa-8444d66554f2',
-# 				'aud': '2pep47r3qqvl05ub83jtk3qukp',
-# 				'event_id': '4c1c4dda-a53c-4eb6-9188-1de321a3878f',
-# 				'token_use': 'id',
-# 				'auth_time': '1663701976',
-# 				'exp': 'Thu Sep 22 22:46:46 UTC 2022',
-# 				'iat': 'Thu Sep 22 21:46:47 UTC 2022',
-# 				'jti': 'ab2b9be2-fb7b-42f7-8259-e9ee8021f0fb',
-# 				'email': '24.daniel.long@gmail.com'
-# 			}
-# 		},
-# 		'resourcePath': '/communities/{community_id}/enrollment',
-# 		'httpMethod': 'POST',
-# 		'extendedRequestId': 'Y4eeBEhpSK4FR2w=',
-# 		'requestTime': '22/Sep/2022:22:13:07 +0000',
-# 		'path': '/communities/632ccc0a4a531cf8d1db6cdd/enrollment',
-# 		'accountId': '081924037451',
-# 		'protocol': 'HTTP/1.1',
-# 		'stage': 'prod',
-# 		'domainPrefix': 'api',
-# 		'requestTimeEpoch': 1663884787180,
-# 		'requestId': '3d06b717-e659-4680-9b08-92c0a26eb967',
-# 		'identity': {
-# 			'cognitoIdentityPoolId': None,
-# 			'accountId': None,
-# 			'cognitoIdentityId': None,
-# 			'caller': None,
-# 			'sourceIp': '65.205.72.122',
-# 			'principalOrgId': None,
-# 			'accessKey': None,
-# 			'cognitoAuthenticationType': None,
-# 			'cognitoAuthenticationProvider': None,
-# 			'userArn': None,
-# 			'userAgent': 'PostmanRuntime/7.29.2',
-# 			'user': None
-# 		},
-# 		'domainName': 'api.everyonesacriticapp.com',
-# 		'apiId': 'hvsddp1gol'
-# 	},
-# 	'body': None,
