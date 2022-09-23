@@ -3,6 +3,7 @@ import certifi
 import os
 import json
 import bson.json_util as bson
+from bson.objectid import ObjectId
 import logging
 import datetime
 
@@ -28,19 +29,41 @@ client = pymongo.MongoClient(
 # GET
 # /communities
 def list_communities(event, context):
+    page = 1
+    user_id = None
+
     query_params = event.get('queryStringParameters')
-    if query_params is None:
-        page = 1
-    else:
-        page = int(query_params.get('page', '1'))
+    return_params = ""
+    if query_params is not None:
+        page_param = query_params.get('page')
+        if page_param:
+            page = int(page_param)
+            del query_params['page']
+
+        is_member = query_params.get('isMember')
+        if is_member is not None and is_member.lower() in ['true', '1', 'yes']:
+            user_id = event['requestContext']['authorizer']['claims']['cognito:username']
+
+        for param, arg in query_params.items():
+            return_params += f"&{param}={arg}"
 
     path = event.get('path')
 
     # log.info("this is running")
     db = client['eac-ratings-dev']
     community_collection = db.community
+    community_member_collection = db.community_member
     community_list = []
+    filter = {}
+    if user_id:
+        community_ids = []
+        for member_object in community_member_collection.find({'user_id': user_id}):
+            community_ids.append(ObjectId(member_object['community_id']))
+
+        filter = {'_id': {'$in': list(community_ids)}}
+
     for community_bson in community_collection.find(
+            filter=filter,
             batch_size=PAGE_SIZE + 1,
             sort=[("_-id", pymongo.ASCENDING)],
             skip=(page-1) * PAGE_SIZE):
@@ -52,8 +75,8 @@ def list_communities(event, context):
         'headers': None,
         'multiValueHeaders': None,
         'body': json.dumps({
-            'next': f'{path}?page={page + 1}' if len(community_list) > PAGE_SIZE else None,
-            'previous': f'{path}?page={page - 1}' if page > 1 else None,
+            'next': f'{path}?page={page + 1}{return_params}' if len(community_list) > PAGE_SIZE else None,
+            'previous': f'{path}?page={page - 1}{return_params}' if page > 1 else None,
             'results': community_list[:PAGE_SIZE]
         })
     }
@@ -110,6 +133,6 @@ def leave_community(event, context):
         'statusCode': 200,
         'headers': None,
         'multiValueHeaders': None,
-        'body': {}
+        'body': json.dumps({})
     }
 

@@ -1,4 +1,5 @@
 import pymongo
+from unittest.mock import MagicMock
 
 
 class Community:
@@ -20,11 +21,19 @@ class CommunityMember:
             return {}
 
     @staticmethod
+    def find(*args, **kwargs):
+        return [
+            {'community_id': '632ccc0a4a531cf8d1db6cdd'},
+            {'community_id': '632ccc0a4a531cf8d1db6cdf'},
+            {'community_id': '632ccc0a4a531cf8d1db6ce0'}
+        ]
+
+    @staticmethod
     def delete_one(*args, **kwargs):
         return {}
 
 
 class MongoCollections:
-    def __init__(self, records=None, already_exists=False):
-        self.community = Community(records)
-        self.community_member = CommunityMember(already_exists)
+    def __init__(self, community_mock=None, community_member_mock=None):
+        self.community = community_mock or MagicMock()
+        self.community_member = community_member_mock or MagicMock()
