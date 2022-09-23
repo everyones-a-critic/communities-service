@@ -53,7 +53,7 @@ def list_communities(event, context):
     path = event.get('path')
 
     # log.info("this is running")
-    db = client['eac-ratings-dev']
+    db = client['prod']
     community_collection = db.community
     community_member_collection = db.community_member
 
