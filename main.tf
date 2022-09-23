@@ -120,6 +120,7 @@ resource "mongodbatlas_database_user" "admin" {
   }
 }
 
+# This errors silently and doesn't get created if no data has been loaded yet. TODO: figure out deployment sequence
 resource "mongodbatlas_search_index" "community_name" {
   name   = "default"
   project_id = mongodbatlas_project.main.id
