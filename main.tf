@@ -75,13 +75,13 @@ module "leave_community" {
 
 
 resource "mongodbatlas_project" "main" {
-  name   = "eac-ratings"
+  name   = "everyones-a-critic"
   org_id = var.mongo_org_id
 }
 
 resource "mongodbatlas_advanced_cluster" "main" {
   project_id   = mongodbatlas_project.main.id
-  name         = "eac-ratings-dev"
+  name         = "prod"
   cluster_type = "REPLICASET"
 
   replication_specs {
@@ -118,6 +118,19 @@ resource "mongodbatlas_database_user" "admin" {
     name = mongodbatlas_advanced_cluster.main.name
     type = "CLUSTER"
   }
+}
+
+resource "mongodbatlas_search_index" "community_name" {
+  name   = "project-name"
+  project_id = mongodbatlas_project.main.id
+  cluster_name = mongodbatlas_advanced_cluster.main.name
+
+  analyzer = "lucene.standard"
+  collection_name = "community"
+  database = "prod"
+  mappings_dynamic = true
+
+  search_analyzer = "lucene.standard"
 }
 
 resource "aws_iam_role" "mongo-atlas-access" {
