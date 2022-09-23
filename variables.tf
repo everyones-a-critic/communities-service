@@ -16,3 +16,7 @@ variable "mongo_org_id" {
   description = "Organization id from mongo"
   default     = "61527ca063086f463022f613"
 }
+
+variable "cli_user_password" {
+  description = "Password for logging into mongo cluster via the CLI to perform database setup tasks not supported via terraform"
+}
