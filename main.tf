@@ -208,7 +208,7 @@ resource "mongodbatlas_cloud_provider_access_authorization" "auth_role" {
 resource "mongodbatlas_project_ip_access_list" "main" {
   project_id = mongodbatlas_cloud_provider_access_setup.main.project_id
   cidr_block = "0.0.0.0/0"
-  comment    = "Access from anywhere, as we need to access this from a lambda and private networks aren't supported on the free tier"
+  comment    = "Access from anywhere, as private networks aren't supported on the free tier"
 }
 
 resource "mongodbatlas_database_user" "test" {
