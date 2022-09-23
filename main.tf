@@ -58,7 +58,7 @@ module "join_community" {
   service_name     = "join-community"
   command          = "services.join_community"
   http_method = "POST"
-  gateway_resource = aws_api_gateway_resource.enrollment
+  gateway_resource = aws_api_gateway_resource.members
   lambda_role = aws_iam_role.mongo-atlas-access.arn
   mongo_cluster = mongodbatlas_advanced_cluster.main
 }
@@ -68,7 +68,7 @@ module "leave_community" {
   service_name     = "leave-community"
   command          = "services.leave_community"
   http_method = "DELETE"
-  gateway_resource = aws_api_gateway_resource.enrollment
+  gateway_resource = aws_api_gateway_resource.members
   lambda_role = aws_iam_role.mongo-atlas-access.arn
   mongo_cluster = mongodbatlas_advanced_cluster.main
 }
