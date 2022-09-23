@@ -31,6 +31,7 @@ client = pymongo.MongoClient(
 def list_communities(event, context):
     page = 1
     user_id = None
+    search_string = None
 
     query_params = event.get('queryStringParameters')
     return_params = ""
@@ -44,6 +45,8 @@ def list_communities(event, context):
         if is_member is not None and is_member.lower() in ['true', '1', 'yes']:
             user_id = event['requestContext']['authorizer']['claims']['cognito:username']
 
+        search_string = query_params.get('searchString')
+
         for param, arg in query_params.items():
             return_params += f"&{param}={arg}"
 
@@ -53,20 +56,36 @@ def list_communities(event, context):
     db = client['eac-ratings-dev']
     community_collection = db.community
     community_member_collection = db.community_member
-    community_list = []
-    filter = {}
-    if user_id:
-        community_ids = []
-        for member_object in community_member_collection.find({'user_id': user_id}):
-            community_ids.append(ObjectId(member_object['community_id']))
 
-        filter = {'_id': {'$in': list(community_ids)}}
+    if search_string:
+        search_pipeline = [{"$search": {
+            "text": {
+                "path": "name",
+                "query": search_string,
+                "fuzzy": {}
+            }
+        }}]
 
-    for community_bson in community_collection.find(
-            filter=filter,
+        cursor = community_collection.aggregate(search_pipeline)
+
+    else:
+        query_filter = {}
+        if user_id:
+            community_ids = []
+            for member_object in community_member_collection.find({'user_id': user_id}):
+                community_ids.append(ObjectId(member_object['community_id']))
+
+            query_filter = {'_id': {'$in': list(community_ids)}}
+
+        cursor = community_collection.find(
+            filter=query_filter,
             batch_size=PAGE_SIZE + 1,
             sort=[("_-id", pymongo.ASCENDING)],
-            skip=(page-1) * PAGE_SIZE):
+            skip=(page-1) * PAGE_SIZE
+        )
+
+    community_list = []
+    for community_bson in cursor:
         community_list.append(json.loads(bson.dumps(community_bson)))
 
     return {

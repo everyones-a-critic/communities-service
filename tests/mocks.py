@@ -9,6 +9,9 @@ class Community:
     def find(self, *args, **kwargs):
         return self.records
 
+    def aggregate(self, *args, **kwargs):
+        return self.records
+
 
 class CommunityMember:
     def __init__(self, already_exists=False):

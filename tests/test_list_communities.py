@@ -144,6 +144,29 @@ class TestListCommunities(unittest.TestCase):
             skip=0
         )
 
+    @patch('pymongo.database.Database')
+    @patch('pymongo.MongoClient.__init__')
+    def test_search(self, clientMock, databaseClassMock):
+        community_list = []
+        for i in range(1, 27):
+            community_list.append({'name': str(i), 'some_value': i})
+
+        clientMock.return_value = None
+        databaseClassMock.return_value = MongoCollections(
+            community_mock=Community(community_list),
+        )
+
+        import services
+        communities = services.list_communities({
+            'path': '/communities', 'queryStringParameters': {'searchString': 'test'},
+            'requestContext': {'authorizer': {'claims': {'cognito:username': 'joe'}}},
+        }, {})
+
+        body_json = json.loads(communities['body'])
+        self.assertEqual(body_json['next'], '/communities?page=2&searchString=test')
+        self.assertIsNone(body_json['previous'])
+        self.assertEqual(community_list[0:25], body_json['results'])
+
 
 if __name__ == '__main__':
     unittest.main()
