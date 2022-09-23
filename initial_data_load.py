@@ -22,10 +22,12 @@ def load_data():
 
     db = client['eac-ratings-dev']
     community_coll = db.community
+    community_coll.create_index("name")
     community_coll.drop()
-
     result = community_coll.insert_many(communities_to_insert)
-    print(result.inserted_ids)
+
+    community_member = db.community_member
+    community_member.create_index([("user_id", pymongo.ASCENDING), ("community_id", pymongo.ASCENDING)], unique=True)
 
     client.close()
 

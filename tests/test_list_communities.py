@@ -1,20 +1,7 @@
 import unittest
 from unittest.mock import patch
 import json
-
-
-# Mock Objects
-class Community:
-    def __init__(self, records):
-        self.records = records
-
-    def find(self, *args, **kwargs):
-        return self.records
-
-
-class MongoCollections:
-    def __init__(self, records):
-        self.community = Community(records)
+from mocks import MongoCollections
 
 
 class TestListCommunities(unittest.TestCase):
