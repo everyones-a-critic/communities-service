@@ -145,7 +145,7 @@ def leave_community(event, context):
 
     community_member.delete_one({
         "community_id": community_id,
-        user_id: "user_id",
+        "user_id": user_id,
     })
 
     return {
