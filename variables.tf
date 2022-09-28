@@ -20,3 +20,7 @@ variable "mongo_org_id" {
 variable "cli_user_password" {
   description = "Password for logging into mongo cluster via the CLI to perform database setup tasks not supported via terraform"
 }
+
+variable "environment" {
+    description = "Whether terraform is creating the dev, test, or prod environment"
+}
