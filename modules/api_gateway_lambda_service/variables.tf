@@ -30,3 +30,7 @@ variable "lambda_role" {
 variable "http_method" {
     description = "What type of http method should be used to execute the lambda"
 }
+
+variable "environment" {
+    description = "Whether terraform is creating the dev, test, or prod environment"
+}

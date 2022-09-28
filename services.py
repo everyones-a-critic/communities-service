@@ -18,6 +18,7 @@ logging.basicConfig(**default_log_args)
 log = logging.getLogger("Run-Lambda")
 
 PAGE_SIZE = 25
+MONGO_CLUSTER_NAME = os.environ.get('MONGO_CLUSTER_NAME')
 
 ca = certifi.where()
 client = pymongo.MongoClient(
@@ -53,7 +54,7 @@ def list_communities(event, context):
     path = event.get('path')
 
     # log.info("this is running")
-    db = client['prod']
+    db = client[MONGO_CLUSTER_NAME]
     community_collection = db.community
     community_member_collection = db.community_member
 
@@ -107,7 +108,7 @@ def join_community(event, context):
     user_id = event['requestContext']['authorizer']['claims']['cognito:username']
     community_id = event['pathParameters']['community_id']
 
-    db = client['eac-ratings-dev']
+    db = client[MONGO_CLUSTER_NAME]
     community_member = db.community_member
     try:
         community_member.insert_one({
@@ -139,7 +140,7 @@ def leave_community(event, context):
     user_id = event['requestContext']['authorizer']['claims']['cognito:username']
     community_id = event['pathParameters']['community_id']
 
-    db = client['eac-ratings-dev']
+    db = client[MONGO_CLUSTER_NAME]
     community_member = db.community_member
 
     community_member.delete_one({
