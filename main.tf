@@ -47,6 +47,17 @@ resource "aws_api_gateway_resource" "community_id" {
   rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
 }
 
+module "get_community_service" {
+  source = "./modules/api_gateway_lambda_service"
+  service_name     = "get-community"
+  command          = "services.get_community"
+  http_method = "GET"
+  gateway_resource = aws_api_gateway_resource.community_id
+  lambda_role = aws_iam_role.mongo-atlas-access.arn
+  mongo_cluster = mongodbatlas_advanced_cluster.main
+}
+
+
 resource "aws_api_gateway_resource" "members" {
   path_part   = "members"
   parent_id   = aws_api_gateway_resource.community_id.id

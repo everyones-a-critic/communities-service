@@ -102,6 +102,33 @@ def list_communities(event, context):
     }
 
 
+# GET
+# /communities/{community_id}/
+def get_community(event, context):
+    community_id = event['pathParameters']['community_id']
+
+    db = client[MONGO_CLUSTER_NAME]
+    community_collection = db.community
+
+    community_bson = community_collection.find_one({"_id": ObjectId('632e3efb0a0e0b0b59712cbf')})
+    if community_bson:
+        return {
+            "isBase64Encoded": True,
+            'statusCode': 200,
+            'headers': None,
+            'multiValueHeaders': None,
+            'body': json.dumps(json.loads(bson.dumps(community_bson)))
+        }
+    else:
+        return {
+            "isBase64Encoded": True,
+            'statusCode': 404,
+            'headers': None,
+            'multiValueHeaders': None,
+            'body': json.dumps({"message": "Not found"})
+        }
+
+
 # POST
 # /communities/{community_id}/members
 def join_community(event, context):

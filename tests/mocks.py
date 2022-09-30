@@ -3,11 +3,15 @@ from unittest.mock import MagicMock
 
 
 class Community:
-    def __init__(self, records):
+    def __init__(self, records=[]):
         self.records = records
 
     def find(self, *args, **kwargs):
         return self.records
+
+    def find_one(self, *args, **kwargs):
+        if self.records:
+            return self.records[0]
 
     def aggregate(self, *args, **kwargs):
         return self.records
