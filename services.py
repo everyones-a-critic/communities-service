@@ -177,7 +177,7 @@ def leave_community(event, context):
 
     return {
         "isBase64Encoded": True,
-        'statusCode': 200,
+        'statusCode': 204,
         'headers': None,
         'multiValueHeaders': None,
         'body': json.dumps({})
