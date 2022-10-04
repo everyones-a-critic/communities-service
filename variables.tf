@@ -8,7 +8,7 @@ variable "aws_account_id" {
 }
 
 variable "environment" {
-    description = "Whether terraform is creating the dev, test, or prod environment"
+  description = "Whether terraform is creating the dev, test, or prod environment"
 }
 
 variable "mongo_region" {
