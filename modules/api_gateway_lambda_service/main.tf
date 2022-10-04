@@ -23,8 +23,8 @@ resource "aws_lambda_function" "main" {
 
   environment {
     variables = {
-      MONGO_URI = var.mongo_cluster.connection_strings.0.standard_srv
-      MONGO_CLUSTER_NAME = var.mongo_cluster.name
+      MONGO_URI = var.mongo_cluster_uri
+      MONGO_CLUSTER_NAME = var.mongo_cluster_name
     }
   }
 }

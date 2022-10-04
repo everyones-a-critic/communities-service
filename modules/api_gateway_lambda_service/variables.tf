@@ -19,8 +19,12 @@ variable "gateway_resource" {
     description = "API Gateway resource id housing the endpoint through which the lambda function will be exposed"
 }
 
-variable "mongo_cluster" {
-    description = "Terraform resource representing the mongo cluster which will be used by the lambda"
+variable "mongo_cluster_uri" {
+    description = "Terraform resource representing the mongo variables which will be used by the lambda"
+}
+
+variable "mongo_cluster_name" {
+    description = "Terraform resource representing the mongo variables which will be used by the lambda"
 }
 
 variable "lambda_role" {

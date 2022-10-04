@@ -25,128 +25,29 @@ data "tfe_outputs" "api_gateway" {
   workspace    = "api-gateway"
 }
 
-resource "aws_api_gateway_resource" "communities" {
-  path_part   = "communities"
-  parent_id   = data.tfe_outputs.api_gateway.values.root_resource_id
-  rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
+data "tfe_outputs" "mongo_db" {
+  organization = "everyones-a-critic"
+  workspace    = "mongo-db"
 }
 
-module "get_communities_service" {
-  source = "./modules/api_gateway_lambda_service"
-  service_name     = "get-communities"
-  command          = "services.list_communities"
-  http_method = "GET"
-  gateway_resource = aws_api_gateway_resource.communities
-  lambda_role = aws_iam_role.mongo-atlas-access.arn
-  mongo_cluster = mongodbatlas_advanced_cluster.main
+# Creating a cluster specifically for communities-service
+resource "mongodbatlas_serverless_instance" "main" {
+  project_id   = data.tfe_outputs.mongo_db.values.project_id
+  name         = "communities-service-${var.environment}"
+
+  provider_settings_backing_provider_name = "AWS"
+  provider_settings_provider_name = "SERVERLESS"
+  region_name           = var.mongo_region
 }
 
-resource "aws_api_gateway_resource" "community_id" {
-  path_part   = "{community_id}"
-  parent_id   = aws_api_gateway_resource.communities.id
-  rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
-}
-
-module "get_community_service" {
-  source = "./modules/api_gateway_lambda_service"
-  service_name     = "get-community"
-  command          = "services.get_community"
-  http_method = "GET"
-  gateway_resource = aws_api_gateway_resource.community_id
-  lambda_role = aws_iam_role.mongo-atlas-access.arn
-  mongo_cluster = mongodbatlas_advanced_cluster.main
-}
-
-
-resource "aws_api_gateway_resource" "members" {
-  path_part   = "members"
-  parent_id   = aws_api_gateway_resource.community_id.id
-  rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
-}
-
-module "join_community" {
-  source = "./modules/api_gateway_lambda_service"
-  service_name     = "join-community"
-  command          = "services.join_community"
-  http_method = "POST"
-  gateway_resource = aws_api_gateway_resource.members
-  lambda_role = aws_iam_role.mongo-atlas-access.arn
-  mongo_cluster = mongodbatlas_advanced_cluster.main
-}
-
-module "leave_community" {
-  source = "./modules/api_gateway_lambda_service"
-  service_name     = "leave-community"
-  command          = "services.leave_community"
-  http_method = "DELETE"
-  gateway_resource = aws_api_gateway_resource.members
-  lambda_role = aws_iam_role.mongo-atlas-access.arn
-  mongo_cluster = mongodbatlas_advanced_cluster.main
-}
-
-
-resource "mongodbatlas_project" "main" {
-  name   = "everyones-a-critic"
-  org_id = var.mongo_org_id
-}
-
-resource "mongodbatlas_advanced_cluster" "main" {
-  project_id   = mongodbatlas_project.main.id
-  name         = "prod"
-  cluster_type = "REPLICASET"
-
-  replication_specs {
-    region_configs {
-      electable_specs {
-        instance_size = "M0"
-      }
-
-      provider_name         = "TENANT"
-      backing_provider_name = "AWS"
-      region_name           = var.mongo_region
-      priority              = 7
-    }
-  }
-}
-
+# Creating mongo resources to grant AWS lambdas access to mongo clusters
 resource "mongodbatlas_cloud_provider_access_setup" "main" {
-  project_id    = mongodbatlas_project.main.id
+  project_id    = data.tfe_outputs.mongo_db.values.project_id
   provider_name = "AWS"
 }
 
-resource "mongodbatlas_database_user" "admin" {
-  username           = aws_iam_role.mongo-atlas-access.arn
-  project_id         = mongodbatlas_project.main.id
-  auth_database_name = "$external"
-  aws_iam_type       = "ROLE"
-
-  roles {
-    role_name     = "readWriteAnyDatabase"
-    database_name = "admin"
-  }
-
-  scopes {
-    name = mongodbatlas_advanced_cluster.main.name
-    type = "CLUSTER"
-  }
-}
-
-# This errors silently and doesn't get created if no data has been loaded yet. TODO: figure out deployment sequence
-resource "mongodbatlas_search_index" "community_name" {
-  name   = "default"
-  project_id = mongodbatlas_project.main.id
-  cluster_name = mongodbatlas_advanced_cluster.main.name
-
-  analyzer = "lucene.standard"
-  collection_name = "community"
-  database = "prod"
-  mappings_dynamic = true
-
-  search_analyzer = "lucene.standard"
-}
-
 resource "aws_iam_role" "mongo-atlas-access" {
-  name = "mongo-atlas-access-${mongodbatlas_advanced_cluster.main.name}"
+  name = "mongo-atlas-access-${mongodbatlas_serverless_instance.main.name}"
 
   assume_role_policy = <<EOF
 {
@@ -175,6 +76,100 @@ resource "aws_iam_role" "mongo-atlas-access" {
   ]
 }
 EOF
+}
+
+resource "mongodbatlas_database_user" "admin" {
+  username           = aws_iam_role.mongo-atlas-access.arn
+  project_id         = data.tfe_outputs.mongo_db.values.project_id
+  auth_database_name = "$external"
+  aws_iam_type       = "ROLE"
+
+  roles {
+    role_name     = "readWriteAnyDatabase"
+    database_name = "admin"
+  }
+
+  scopes {
+    name = mongodbatlas_serverless_instance.main.name
+    type = "CLUSTER"
+  }
+}
+
+# This errors silently and doesn't get created if no data has been loaded yet. TODO: figure out deployment sequence
+resource "mongodbatlas_search_index" "community_name" {
+  name   = "default"
+  project_id = data.tfe_outputs.mongo_db.values.project_id
+  cluster_name = mongodbatlas_serverless_instance.main.name
+  analyzer = "lucene.standard"
+  collection_name = "community"
+  database = "prod"
+  mappings_dynamic = true
+
+  search_analyzer = "lucene.standard"
+}
+
+# Creating AWS Resources
+
+resource "aws_api_gateway_resource" "communities" {
+  path_part   = "communities"
+  parent_id   = data.tfe_outputs.api_gateway.values.root_resource_id
+  rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
+}
+
+module "get_communities_service" {
+  source = "./modules/api_gateway_lambda_service"
+  service_name     = "get-communities"
+  command          = "services.list_communities"
+  http_method = "GET"
+  gateway_resource = aws_api_gateway_resource.communities
+  lambda_role = aws_iam_role.mongo-atlas-access.arn
+  mongo_cluster_uri = mongodbatlas_serverless_instance.main.connection_strings_standard_srv
+  mongo_cluster_name = mongodbatlas_serverless_instance.main.name
+}
+
+resource "aws_api_gateway_resource" "community_id" {
+  path_part   = "{community_id}"
+  parent_id   = aws_api_gateway_resource.communities.id
+  rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
+}
+
+module "get_community_service" {
+  source = "./modules/api_gateway_lambda_service"
+  service_name     = "get-community"
+  command          = "services.get_community"
+  http_method = "GET"
+  gateway_resource = aws_api_gateway_resource.community_id
+  lambda_role = aws_iam_role.mongo-atlas-access.arn
+  mongo_cluster_uri = mongodbatlas_serverless_instance.main.connection_strings_standard_srv
+  mongo_cluster_name = mongodbatlas_serverless_instance.main.name
+}
+
+resource "aws_api_gateway_resource" "members" {
+  path_part   = "members"
+  parent_id   = aws_api_gateway_resource.community_id.id
+  rest_api_id = data.tfe_outputs.api_gateway.values.gateway_id
+}
+
+module "join_community" {
+  source = "./modules/api_gateway_lambda_service"
+  service_name     = "join-community"
+  command          = "services.join_community"
+  http_method = "POST"
+  gateway_resource = aws_api_gateway_resource.members
+  lambda_role = aws_iam_role.mongo-atlas-access.arn
+  mongo_cluster_uri = mongodbatlas_serverless_instance.main.connection_strings_standard_srv
+  mongo_cluster_name = mongodbatlas_serverless_instance.main.name
+}
+
+module "leave_community" {
+  source = "./modules/api_gateway_lambda_service"
+  service_name     = "leave-community"
+  command          = "services.leave_community"
+  http_method = "DELETE"
+  gateway_resource = aws_api_gateway_resource.members
+  lambda_role = aws_iam_role.mongo-atlas-access.arn
+  mongo_cluster_uri = mongodbatlas_serverless_instance.main.connection_strings_standard_srv
+  mongo_cluster_name = mongodbatlas_serverless_instance.main.name
 }
 
 # See also the following AWS managed policy: AWSLambdaBasicExecutionRole
@@ -215,22 +210,4 @@ resource "mongodbatlas_cloud_provider_access_authorization" "auth_role" {
   }
 
   depends_on = [aws_iam_role.mongo-atlas-access]
-}
-
-resource "mongodbatlas_project_ip_access_list" "main" {
-  project_id = mongodbatlas_cloud_provider_access_setup.main.project_id
-  cidr_block = "0.0.0.0/0"
-  comment    = "Access from anywhere, as private networks aren't supported on the free tier"
-}
-
-resource "mongodbatlas_database_user" "test" {
-  username           = "cli_user"
-  password           = var.cli_user_password
-  project_id         = mongodbatlas_project.main.id
-  auth_database_name = "admin"
-
-  roles {
-    role_name     = "readWriteAnyDatabase"
-    database_name = "admin"
-  }
 }
