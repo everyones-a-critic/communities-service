@@ -95,19 +95,6 @@ resource "mongodbatlas_database_user" "admin" {
   }
 }
 
-# This errors silently and doesn't get created if no data has been loaded yet. TODO: figure out deployment sequence
-resource "mongodbatlas_search_index" "community_name" {
-  name             = "default"
-  project_id       = data.tfe_outputs.mongo_db.values.project_id
-  cluster_name     = mongodbatlas_serverless_instance.main.name
-  analyzer         = "lucene.standard"
-  collection_name  = "community"
-  database         = "prod"
-  mappings_dynamic = true
-
-  search_analyzer = "lucene.standard"
-}
-
 # Creating AWS Resources
 
 resource "aws_api_gateway_resource" "communities" {

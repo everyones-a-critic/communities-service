@@ -23,7 +23,7 @@ def load_data():
 
     db = client[os.environ.get('MONGO_CLUSTER_NAME')]
     community_coll = db.community
-    community_coll.create_index("name")
+    community_coll.create_index([('name', pymongo.TEXT)])
     existing_communities = set()
     for community in community_coll.find():
         existing_communities.add(community['name'])

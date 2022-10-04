@@ -59,15 +59,10 @@ def list_communities(event, context):
     community_member_collection = db.community_member
 
     if search_string:
-        search_pipeline = [{"$search": {
-            "text": {
-                "path": "name",
-                "query": search_string,
-                "fuzzy": {}
-            }
-        }}]
-
-        cursor = community_collection.aggregate(search_pipeline)
+        query_filter = {'$text': {
+            '$search': 'whisky',
+            '$caseSensitive': False
+        }}
 
     else:
         query_filter = {}
@@ -78,12 +73,12 @@ def list_communities(event, context):
 
             query_filter = {'_id': {'$in': list(community_ids)}}
 
-        cursor = community_collection.find(
-            filter=query_filter,
-            batch_size=PAGE_SIZE + 1,
-            sort=[("_-id", pymongo.ASCENDING)],
-            skip=(page-1) * PAGE_SIZE
-        )
+    cursor = community_collection.find(
+        filter=query_filter,
+        batch_size=PAGE_SIZE + 1,
+        sort=[("_-id", pymongo.ASCENDING)],
+        skip=(page-1) * PAGE_SIZE
+    )
 
     community_list = []
     for community_bson in cursor:
