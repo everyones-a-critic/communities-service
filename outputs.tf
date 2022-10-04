@@ -1,4 +1,4 @@
 output "mongo_uri" {
   description="The url to use to connect to the mongo cluster"
-  value = mongodbatlas_advanced_cluster.main.connection_strings.0.standard_srv
+  value = mongodbatlas_serverless_instance.main.connection_strings_standard_srv
 }
