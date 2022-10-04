@@ -60,7 +60,7 @@ def list_communities(event, context):
 
     if search_string:
         query_filter = {'$text': {
-            '$search': 'whisky',
+            '$search': search_string,
             '$caseSensitive': False
         }}
 
