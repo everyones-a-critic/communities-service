@@ -202,7 +202,7 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
 }
 
 resource "mongodbatlas_cloud_provider_access_authorization" "auth_role" {
-  project_id = mongodbatlas_cloud_provider_access_setup.main.project_id
+  project_id = data.tfe_outputs.mongo_db.values.project_id
   role_id    = mongodbatlas_cloud_provider_access_setup.main.role_id
 
   aws {
