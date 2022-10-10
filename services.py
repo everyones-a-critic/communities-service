@@ -105,7 +105,7 @@ def get_community(event, context):
     db = client[MONGO_CLUSTER_NAME]
     community_collection = db.community
 
-    community_bson = community_collection.find_one({"_id": ObjectId('632e3efb0a0e0b0b59712cbf')})
+    community_bson = community_collection.find_one({"_id": ObjectId(community_id)})
     if community_bson:
         return {
             "isBase64Encoded": True,
